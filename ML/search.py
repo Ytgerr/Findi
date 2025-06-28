@@ -22,8 +22,3 @@ def similarity_search(sentences: list, query: str, model) -> list:
     filtered_results.sort(key=lambda x: x[1], reverse=True)
     sentences = [item[0] for item in filtered_results]
     return sentences
-
-
-
-
-
