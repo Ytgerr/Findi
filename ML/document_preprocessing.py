@@ -1,10 +1,14 @@
 import pandas as pd
 import tempfile
 import ffmpeg
+from nltk.tokenize import sent_tokenize
 from io import BytesIO
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer
+import nltk
+import re
 
+nltk.download("punkt", quiet=True)
 
 def preprocessing(File: bytes, file_type: str, model) -> pd.DataFrame:
     match file_type:
@@ -19,9 +23,8 @@ def preprocessing(File: bytes, file_type: str, model) -> pd.DataFrame:
         data["start_time"] = None
     if "end_time" not in data.columns:
         data["end_time"] = None
-    return data[["sentence", "start_time", "end_time"]]
+    return data[["sentences", "start_time", "end_time"]]
    
-
 
 def pdf_transcribe(pdf_bytes: bytes) -> str:
     text_per_page = {}
@@ -36,7 +39,10 @@ def pdf_transcribe(pdf_bytes: bytes) -> str:
         text_per_page[pagenum] = ''.join(page_content)
 
     text = ''.join(text_per_page.values())
-    return pd.DataFrame([{"text": text}])
+    sentences = sent_tokenize(text)
+    sentences = [re.sub(r"\n", " ", sent) for sent in sentences]
+    
+    return pd.DataFrame({"sentences": sentences})
 
 def audio_transcribe(File: bytes, model) -> pd.DataFrame:
     with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as tmp:
