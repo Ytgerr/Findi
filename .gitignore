@@ -4,3 +4,5 @@
 /scr/__pycache__
 /ML/__pycache__
 __pycache__
+
+.env
