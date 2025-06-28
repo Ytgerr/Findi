@@ -7,6 +7,7 @@ from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer
 import nltk
 import re
+import os
 
 nltk.download("punkt", quiet=True)
 
@@ -26,7 +27,7 @@ def preprocessing(File: bytes, file_type: str, model) -> pd.DataFrame:
     return data[["sentences", "start_time", "end_time"]]
    
 
-def pdf_transcribe(pdf_bytes: bytes) -> str:
+def pdf_transcribe(pdf_bytes: bytes) -> pd.DataFrame:
     text_per_page = {}
     pdf_stream = BytesIO(pdf_bytes) 
 
@@ -45,11 +46,18 @@ def pdf_transcribe(pdf_bytes: bytes) -> str:
     return pd.DataFrame({"sentences": sentences})
 
 def audio_transcribe(File: bytes, model) -> pd.DataFrame:
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as tmp:
+    import os
+    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
         tmp.write(File)
         tmp.flush()
-        result = model.transcribe(tmp.name)
+        tmp_path = tmp.name
+
+    try:
+        result = model.transcribe(tmp_path)
         segments = result.get("segments", [])
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
     data = []
     for seg in segments:
@@ -65,23 +73,30 @@ def audio_transcribe(File: bytes, model) -> pd.DataFrame:
     return pd.DataFrame(data)
 
 def video_transcribe(File: bytes, model) -> pd.DataFrame:
-    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as video_tmp:
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as video_tmp:
         video_tmp.write(File)
         video_tmp.flush()
-        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as audio_tmp:
-            try:
-                out, err = (
-                    ffmpeg
-                    .input(video_tmp.name)
-                    .output(audio_tmp.name, format='mp3', acodec='libmp3lame', ac=1, ar='16000')
-                    .overwrite_output()
-                    .run(capture_stdout=True, capture_stderr=True)
-                )
-            except ffmpeg.Error as e:
-                print("FFMPEG STDOUT:", e.stdout.decode())
-                print("FFMPEG STDERR:", e.stderr.decode())
-                raise
-            audio_tmp.seek(0)
-            audio_bytes = audio_tmp.read()
+        video_tmp_path = video_tmp.name
+
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as audio_tmp:
+            audio_tmp_path = audio_tmp.name
+
+        try:
+            out, err = (
+                ffmpeg
+                .input(video_tmp_path)
+                .output(audio_tmp_path, format='mp3', acodec='libmp3lame', ac=1, ar='16000')
+                .overwrite_output()
+                .run(capture_stdout=True, capture_stderr=True)
+            )
+            with open(audio_tmp_path, "rb") as f:
+                audio_bytes = f.read()
             return audio_transcribe(audio_bytes, model)
+        finally:
+            if os.path.exists(audio_tmp_path):
+                os.remove(audio_tmp_path)
+    finally:
+        if os.path.exists(video_tmp_path):
+            os.remove(video_tmp_path)
 
