@@ -1,4 +1,4 @@
-## Dependancies Installation
+## Dependencies Installation
 
 ### Use uv for installation (can be loaded at [link](https://docs.astral.sh/uv/getting-started/installation/))
 
