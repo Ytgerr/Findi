@@ -65,19 +65,23 @@ def audio_transcribe(File: bytes, model) -> pd.DataFrame:
     return pd.DataFrame(data)
 
 def video_transcribe(File: bytes, model) -> pd.DataFrame:
-    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as tmp:
-        tmp.write(File)
-        tmp.flush()
-        
-        (
-            ffmpeg
-            .input(tmp.name)
-            .output(tmp.name, format='mp3', acodec='libmp3lame', ac=1, ar='16000')
-            .overwrite_output()
-            .run(quiet=True)
-        )
-        
-        tmp.seek(0)
-        audio_bytes = tmp.read()
-    return audio_transcribe(audio_bytes, model)
-    
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=True) as video_tmp:
+        video_tmp.write(File)
+        video_tmp.flush()
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=True) as audio_tmp:
+            try:
+                out, err = (
+                    ffmpeg
+                    .input(video_tmp.name)
+                    .output(audio_tmp.name, format='mp3', acodec='libmp3lame', ac=1, ar='16000')
+                    .overwrite_output()
+                    .run(capture_stdout=True, capture_stderr=True)
+                )
+            except ffmpeg.Error as e:
+                print("FFMPEG STDOUT:", e.stdout.decode())
+                print("FFMPEG STDERR:", e.stderr.decode())
+                raise
+            audio_tmp.seek(0)
+            audio_bytes = audio_tmp.read()
+            return audio_transcribe(audio_bytes, model)
+
