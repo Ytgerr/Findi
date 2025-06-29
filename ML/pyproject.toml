@@ -1,0 +1,15 @@
+[project]
+name = "ML"
+version = "0.1.0"
+description = "ML microservise for semantic search in pdf, video and audio"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "transformers",
+    "openai-whisper",
+    "pdfminer.six",
+    "ffmpeg-python",
+    "nltk",
+    "pandas",
+    "requests",
+]

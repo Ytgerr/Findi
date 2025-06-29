@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+pandas
+nltk
+pdfminer.six
+ffmpeg-python
+openai-whisper
+sentence-transformers
