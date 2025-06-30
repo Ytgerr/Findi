@@ -9,7 +9,6 @@ datasets/
 .env
 *.env
 *.log
-*.lock
 .idea/
 .vscode/
 .DS_Store

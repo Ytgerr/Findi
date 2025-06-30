@@ -7,3 +7,4 @@ pdfminer.six
 ffmpeg-python
 openai-whisper
 sentence-transformers
+faiss-cpu

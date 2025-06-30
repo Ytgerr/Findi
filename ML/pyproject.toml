@@ -12,4 +12,7 @@ dependencies = [
     "nltk",
     "pandas",
     "requests",
+    "faiss-cpu",
+    "sentence-transformers",
+    "python-multipart",
 ]
