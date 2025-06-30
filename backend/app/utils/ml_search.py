@@ -1,4 +1,5 @@
 import requests
+import base64
 from pydantic import BaseModel
 
 
@@ -9,7 +10,7 @@ class MLSearchResponse(BaseModel):
 
 class DocumentRequest(BaseModel):
     file_name: str
-    file_content: str
+    file_content: bytes
     file_type: str
     query: str
 
@@ -27,3 +28,4 @@ def ml_search(document_request: DocumentRequest, url: str) -> MLSearchResponse:
         data={"query": document_request.query},
     )
     return MLSearchResponse(**response.json())
+
