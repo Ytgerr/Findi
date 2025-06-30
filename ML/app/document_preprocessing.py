@@ -9,8 +9,6 @@ import nltk
 import re
 import os
 
-nltk.download("punkt", quiet=True)
-
 
 def preprocessing(File: bytes, file_type: str, model) -> pd.DataFrame:
     match file_type:

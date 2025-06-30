@@ -14,6 +14,11 @@ RUN uv sync --frozen --no-cache
 
 COPY . /app
 
+RUN .venv/bin/python -m nltk.downloader punkt
+
+RUN .venv/bin/python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('Snowflake/snowflake-arctic-embed-l-v2.0')"
+RUN .venv/bin/python -c "import whisper; whisper.load_model('base')"
+
 EXPOSE 8000
 
 CMD ["/app/.venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

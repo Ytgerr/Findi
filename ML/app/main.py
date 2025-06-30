@@ -5,6 +5,7 @@ from .app_state import init_models
 from .search import similarity_search
 from .document_preprocessing import preprocessing
 import warnings
+import os
 
 warnings.filterwarnings("ignore", message="TypedStorage is deprecated")
 
@@ -29,12 +30,15 @@ app.add_middleware(
 @app.post("/semantic-search/")
 async def semantic_search(
         file: UploadFile = File(...),
-        query: str = Form(...),
-        types: str = Form(...)):
-
+        query: str = Form(...)
+):
     content = await file.read()
+   
+    filename = file.filename
+    file_type = os.path.splitext(filename)[1].lstrip(".").lower() 
+
     audio_model = app.state.audio_model
-    data = preprocessing(content, types, audio_model)
+    data = preprocessing(content, file_type, audio_model)
     text_data = data["sentences"].tolist()
     embed_model = app.state.embed_model
     result = similarity_search(text_data, query, embed_model)
