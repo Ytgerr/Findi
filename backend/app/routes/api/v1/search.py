@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File, Form
 import os
 
 from app.utils.ml_search import ml_search, DocumentRequest
@@ -10,13 +10,18 @@ search_link = ml_url + "/semantic_search"
 
 
 @router.post("/pdf_search")
-async def pdf_search(request: DocumentRequest):
+async def pdf_search(
+    file: UploadFile = File(...),
+    query: str = Form(...)
+):
+    file_content = await file.read()
+    
     response = ml_search(
         DocumentRequest(
-            file_name=request.file_name,
-            file_content=request.file_content,
+            file_name=file.filename or "document.pdf",
+            file_content=file_content,
             file_type="application/pdf",
-            query=request.query,
+            query=query,
         ),
         search_link,
     )
@@ -24,13 +29,18 @@ async def pdf_search(request: DocumentRequest):
 
 
 @router.post("/mp3_search")
-async def mp3_search(request: DocumentRequest):
+async def mp3_search(
+    file: UploadFile = File(...),
+    query: str = Form(...)
+):
+    file_content = await file.read()
+    
     response = ml_search(
         DocumentRequest(
-            file_name=request.file_name,
-            file_content=request.file_content,
+            file_name=file.filename or "audio.mp3",
+            file_content=file_content,
             file_type="audio/mp3",
-            query=request.query,
+            query=query,
         ),
         search_link,
     )
@@ -38,13 +48,18 @@ async def mp3_search(request: DocumentRequest):
 
 
 @router.post("/mp4_search")
-async def mp4_search(request: DocumentRequest):
+async def mp4_search(
+    file: UploadFile = File(...),
+    query: str = Form(...)
+):
+    file_content = await file.read()
+    
     response = ml_search(
         DocumentRequest(
-            file_name=request.file_name,
-            file_content=request.file_content,
+            file_name=file.filename or "video.mp4",
+            file_content=file_content,
             file_type="video/mp4",
-            query=request.query,
+            query=query,
         ),
         search_link,
     )
