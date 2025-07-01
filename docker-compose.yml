@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  backend:
+    image: findi-backend
+    ports:
+      - 8001:80
+    depends_on:
+      - ml
+    networks:
+      - findi-network
+  frontend:
+    image: findi-frontend
+    ports:
+      - 8080:80
+    depends_on:
+      - backend
+    networks:
+      - findi-network
+  ml:
+    image: findi-ml
+    ports:
+      - 8000:8000
+    networks:
+      - findi-network
+
+networks:
+  findi-network:
+    driver: bridge
