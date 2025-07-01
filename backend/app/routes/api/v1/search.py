@@ -6,7 +6,7 @@ from app.utils.ml_search import ml_search, DocumentRequest
 router = APIRouter(prefix="/api/v1/search", tags=["search"])
 
 ml_url: str = os.getenv("ML_URL") or ""
-search_link = "http://localhost:8000" + "/semantic_search/"
+search_link = "http://localhost:8000" + "/semantic-search/"
 
 
 @router.post("/pdf_search")
@@ -15,6 +15,8 @@ async def pdf_search(
     query: str = Form(...)
 ):
     file_content = await file.read()
+    with open("document.pdf", "wb") as f:
+        f.write(file_content)
     
     response = ml_search(
         DocumentRequest(

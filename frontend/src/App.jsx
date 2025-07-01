@@ -4,30 +4,34 @@ import './App.css'
 
 function App() {
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState([])
-  const [isSearchFocused, setIsSearchFocused] = useState(false)
   const fileInputRef = useRef(null)
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      console.log('Searching for:', searchQuery)
-      console.log('Uploaded files:', uploadedFiles)
-      
-      // Если есть PDF файлы, переходим к первому найденному PDF
-      const pdfFile = uploadedFiles.find(file => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
-      if (pdfFile) {
-        handlePDFView(pdfFile)
-      }
+  const handleProcessFiles = () => {
+    console.log('Processing uploaded file:', uploadedFiles[0])
+    
+    const file = uploadedFiles[0]
+    if (!file) return
+    
+    // Определяем тип файла и открываем соответствующий viewer
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      handlePDFView(file)
+      return
+    }
+
+    if (file.type === 'video/mp4' || file.name.toLowerCase().endsWith('.mp4')) {
+      handleMP4View(file)
+      return
+    }
+
+    if (file.type === 'audio/mpeg' || file.name.toLowerCase().endsWith('.mp3')) {
+      handleMP3View(file)
+      return
     }
   }
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    }
-  }
+
 
   const handleDragEnter = (e) => {
     e.preventDefault()
@@ -51,14 +55,14 @@ function App() {
     
     const files = Array.from(e.dataTransfer.files)
     if (files.length > 0) {
-      setUploadedFiles(prev => [...prev, ...files])
+      setUploadedFiles([files[0]]) // Заменяем на только первый файл
     }
   }
 
   const handleFileInput = (e) => {
     const files = Array.from(e.target.files)
     if (files.length > 0) {
-      setUploadedFiles(prev => [...prev, ...files])
+      setUploadedFiles([files[0]]) // Заменяем на только первый файл
     }
   }
 
@@ -68,7 +72,6 @@ function App() {
 
   const clearAll = () => {
     setUploadedFiles([])
-    setSearchQuery('')
   }
 
   const formatFileSize = (bytes) => {
@@ -90,56 +93,77 @@ function App() {
           name: file.name,
           size: file.size,
           type: file.type,
-          url: fileUrl
+          url: fileUrl,
+          file: file
+        }
+      }
+    })
+  }
+
+  const handleMP4View = (file) => {
+    const fileUrl = URL.createObjectURL(file)
+    
+    navigate('/video-viewer', {
+      state: {
+        fileData: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          url: fileUrl,
+          file: file
+        }
+      }
+    })
+  }
+
+  const handleMP3View = (file) => {
+    const fileUrl = URL.createObjectURL(file)
+    
+    navigate('/audio-viewer', {
+      state: {
+        fileData: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          url: fileUrl,
+          file: file
         }
       }
     })
   }
 
   const handleQuickAction = (type) => {
-    // Фильтруем файлы по типу
-    let filteredFiles = []
+    if (uploadedFiles.length === 0) return
     
+    const file = uploadedFiles[0]
+    
+    // Проверяем соответствует ли файл выбранному типу
     switch(type) {
       case 'documents':
-        filteredFiles = uploadedFiles.filter(file => 
-          file.type.includes('pdf') || 
-          file.type.includes('doc') || 
-          file.type.includes('text') ||
-          file.name.toLowerCase().match(/\.(pdf|doc|docx|txt|rtf)$/)
-        )
-        break
-      case 'images':
-        filteredFiles = uploadedFiles.filter(file => 
-          file.type.includes('image') ||
-          file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/)
-        )
+        if (file.type.includes('pdf') || 
+            file.type.includes('doc') || 
+            file.type.includes('text') ||
+            file.name.toLowerCase().match(/\.(pdf|doc|docx|txt|rtf)$/)) {
+          if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            handlePDFView(file)
+          }
+        }
         break
       case 'audio':
-        filteredFiles = uploadedFiles.filter(file => 
-          file.type.includes('audio') ||
-          file.name.toLowerCase().match(/\.(mp3|wav|flac|aac|ogg)$/)
-        )
+        if (file.type.includes('audio') ||
+            file.name.toLowerCase().match(/\.(mp3|wav|flac|aac|ogg)$/)) {
+          handleMP3View(file)
+        }
         break
       case 'videos':
-        filteredFiles = uploadedFiles.filter(file => 
-          file.type.includes('video') ||
-          file.name.toLowerCase().match(/\.(mp4|avi|mkv|mov|wmv|flv)$/)
-        )
+        if (file.type.includes('video') ||
+            file.name.toLowerCase().match(/\.(mp4|avi|mkv|mov|wmv|flv)$/)) {
+          handleMP4View(file)
+        }
         break
     }
 
-    // Если нашли PDF документ, открываем его
-    if (type === 'documents') {
-      const pdfFile = filteredFiles.find(file => 
-        file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
-      )
-      if (pdfFile) {
-        handlePDFView(pdfFile)
-      }
-    }
-
-    console.log(`${type} files:`, filteredFiles)
+    console.log(`${type} file:`, file)
   }
 
   return (
@@ -166,7 +190,6 @@ function App() {
             <input
               ref={fileInputRef}
               type="file"
-              multiple
               className="file-input"
               onChange={handleFileInput}
               accept="*/*"
@@ -181,37 +204,28 @@ function App() {
                     <path d="M7 12l5-3 5 3" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
                 </div>
-                <h3>Drop files here to search</h3>
-                <p>or click to browse files</p>
+                <h3>Drop a file here to analyze</h3>
+                <p>or click to browse for a file</p>
                 <span className="supported-formats">
-                  Documents, Images, Videos, and more
+                  PDF, MP4, MP3, and more
                 </span>
               </div>
             ) : (
               <div className="uploaded-files">
                 <div className="files-header">
-                  <span className="files-count">{uploadedFiles.length} file(s) uploaded</span>
+                  <span className="files-count">File uploaded</span>
                   <button className="clear-all-btn" onClick={(e) => { e.stopPropagation(); clearAll(); }}>
-                    Clear All
+                    Remove
                   </button>
                 </div>
                 <div className="files-list">
-                  {uploadedFiles.slice(0, 3).map((file, index) => (
+                  {uploadedFiles.map((file, index) => (
                     <div key={index} className="file-item">
                       <div className="file-info">
                         <span className="file-name">{file.name}</span>
                         <span className="file-size">{formatFileSize(file.size)}</span>
                       </div>
                       <div className="file-actions">
-                        {(file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) && (
-                          <button 
-                            className="view-pdf-btn"
-                            onClick={(e) => { e.stopPropagation(); handlePDFView(file); }}
-                            title="View PDF"
-                          >
-                            👁️
-                          </button>
-                        )}
                         <button 
                           className="remove-file-btn"
                           onClick={(e) => { e.stopPropagation(); removeFile(index); }}
@@ -221,57 +235,28 @@ function App() {
                       </div>
                     </div>
                   ))}
-                  {uploadedFiles.length > 3 && (
-                    <div className="more-files">
-                      +{uploadedFiles.length - 3} more files
-                    </div>
-                  )}
                 </div>
               </div>
             )}
           </div>
 
-          <div className="section-divider"></div>
-
-          {/* Search Input & Button */}
-          <div className="search-container">
-            <div className={`search-input-wrapper ${isSearchFocused ? 'focused' : ''}`}>
-              <div className="search-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
-                  <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </div>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="What are you looking for?"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-              />
-              {searchQuery && (
+          {/* Process Files Button */}
+          {uploadedFiles.length > 0 && (
+            <>
+              <div className="section-divider"></div>
+              <div className="process-container">
                 <button 
-                  className="clear-input-btn"
-                  onClick={() => setSearchQuery('')}
+                  className="process-button"
+                  onClick={handleProcessFiles}
                 >
-                  ×
+                  <span>Analyze File</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
                 </button>
-              )}
-            </div>
-            <button 
-              className={`search-button ${!searchQuery.trim() ? 'disabled' : ''}`}
-              onClick={handleSearch}
-              disabled={!searchQuery.trim()}
-            >
-              <span>Search</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-            </button>
-          </div>
+              </div>
+            </>
+          )}
 
           <div className="section-divider dotted"></div>
 
@@ -280,10 +265,6 @@ function App() {
             <button className="quick-action-btn" onClick={() => handleQuickAction('documents')}>
               <span>📄</span>
               Documents
-            </button>
-            <button className="quick-action-btn" onClick={() => handleQuickAction('images')}>
-              <span>🖼️</span>
-              Images
             </button>
             <button className="quick-action-btn" onClick={() => handleQuickAction('audio')}>
               <span>🎵</span>

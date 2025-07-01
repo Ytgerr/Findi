@@ -50,18 +50,6 @@ export const apiPut = (endpoint, data) => apiRequest(endpoint, {
 // DELETE запросы
 export const apiDelete = (endpoint) => apiRequest(endpoint, { method: 'DELETE' })
 
-// Специализированные функции для вашего приложения
-
-// Анализ PDF документа
-export const analyzeDocument = async (documentData) => {
-  return await apiPost('/search/pdf_search', {
-    file_name: documentData.name,
-    file_content: documentData.content,
-    file_type: documentData.type,
-    query: documentData.query
-  })
-}
-
 // Поиск в PDF документе
 export const searchPDF = async (file, query) => {
   const formData = new FormData()
@@ -71,6 +59,9 @@ export const searchPDF = async (file, query) => {
   try {
     const response = await fetch(`${API_BASE_URL}/search/pdf_search`, {
       method: 'POST',
+      headers: {
+        'accept': 'application/json'
+      },
       body: formData // Не устанавливаем Content-Type для FormData
     })
 
@@ -85,50 +76,58 @@ export const searchPDF = async (file, query) => {
   }
 }
 
-// Поиск в документе
-export const searchInDocument = async (documentId, query) => {
-  return await apiPost('/documents/search', {
-    document_id: documentId,
-    query: query
-  })
-}
-
-// Получение метаданных документа
-export const getDocumentMetadata = async (documentId) => {
-  return await apiGet(`/documents/${documentId}/metadata`)
-}
-
-// Загрузка файла
-export const uploadFile = async (file) => {
+// Поиск в видео файлах
+export const searchMP4 = async (file, query) => {
   const formData = new FormData()
   formData.append('file', file)
+  formData.append('query', query)
 
   try {
-    const response = await fetch(`${API_BASE_URL}/search/pdf_search`, {
+    const response = await fetch(`${API_BASE_URL}/search/mp4_search`, {
       method: 'POST',
-      body: formData // Не устанавливаем Content-Type для FormData
+      headers: {
+        'accept': 'application/json'
+      },
+      body: formData
     })
 
     if (!response.ok) {
-      throw new Error(`Upload failed: ${response.status}`)
+      throw new Error(`Video search failed: ${response.status} - ${response.statusText}`)
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Upload error:', error)
+    console.error('Video search error:', error)
     throw error
   }
 }
 
-// Получить результаты анализа
-export const getAnalysisResults = async (documentId) => {
-  return await apiGet(`/documents/${documentId}/analysis`)
+// Поиск в аудио файлах
+export const searchMP3 = async (file, query) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('query', query)
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/search/mp3_search`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json'
+      },
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw new Error(`Audio search failed: ${response.status} - ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Audio search error:', error)
+    throw error
+  }
 }
 
-// Сохранить дополнительные данные
-export const saveAdditionalData = async (documentId, additionalData) => {
-  return await apiPost(`/documents/${documentId}/metadata`, additionalData)
-}
 
 // Функция для обработки ошибок API
 export const handleApiError = (error) => {

@@ -1,0 +1,263 @@
+/* Дополнительные стили для VideoViewer */
+
+/* Контейнер временного интервала */
+.time-interval-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.time-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  min-width: 35px;
+}
+
+/* Кликабельные временные метки */
+.clickable-time {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+.clickable-time:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5b52f0, #8b5cf6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.clickable-time:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.clickable-time:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Подсказка для временных меток */
+.messages-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Улучшенные стили для сообщений с временными метками */
+.message-block .message-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* Видео плеер стили */
+.pdf-display-area video {
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Placeholder для видео */
+.pdf-placeholder .placeholder-content svg {
+  color: #8b5cf6;
+}
+
+/* Адаптивность для временных меток */
+@media (max-width: 768px) {
+  .time-interval-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .clickable-time {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+/* Анимация для загрузки видео */
+.pdf-display-area video:not([src]) {
+  opacity: 0.5;
+  filter: blur(2px);
+}
+
+.pdf-display-area video[src] {
+  opacity: 1;
+  filter: none;
+  transition: all 0.3s ease;
+}
+
+/* Улучшенные стили для индикатора загрузки */
+.loading-indicator span {
+  font-size: 13px;
+  color: #7c3aed;
+}
+
+/* Стили для контейнера результатов поиска */
+.api-data-header h3 {
+  color: #7c3aed;
+}
+
+/* Выделение активного сообщения (если нужно в будущем) */
+.message-block.active {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  border-left: 3px solid #7c3aed;
+}
+
+/* Аудио плеер в боковой панели */
+.sidebar-audio-player {
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.sidebar-audio-player h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sidebar-audio-control {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Аудио визуализация в центральной области */
+.audio-visualization-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.audio-waveform-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.waveform-bars {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 4px;
+  height: 120px;
+  margin-bottom: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.waveform-bar {
+  background: linear-gradient(180deg, #7c3aed, #a855f7);
+  width: 6px;
+  border-radius: 3px;
+  animation: pulse 2s ease-in-out infinite;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.waveform-bar:hover {
+  opacity: 1;
+  transform: scaleY(1.1);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scaleY(0.6); }
+  50% { transform: scaleY(1); }
+}
+
+.audio-visualization-info {
+  text-align: center;
+  color: #7c3aed;
+}
+
+.audio-visualization-info svg {
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.audio-visualization-info h3 {
+  margin: 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.audio-filename {
+  font-size: 18px;
+  font-weight: 500;
+  color: #7c3aed;
+  margin: 8px 0;
+}
+
+.audio-visualization-hint {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 12px 0;
+  font-style: italic;
+}
+
+/* Адаптивность для аудио визуализации */
+@media (max-width: 768px) {
+  .sidebar-audio-player {
+    padding: 12px;
+  }
+  
+  .sidebar-audio-control {
+    height: 36px;
+  }
+  
+  .audio-waveform-placeholder {
+    padding: 20px 16px;
+  }
+  
+  .waveform-bars {
+    height: 80px;
+    margin-bottom: 24px;
+  }
+  
+  .waveform-bar {
+    width: 4px;
+    gap: 2px;
+  }
+  
+  .audio-visualization-info h3 {
+    font-size: 20px;
+  }
+  
+  .audio-filename {
+    font-size: 16px;
+  }
+  
+  .audio-visualization-info svg {
+    width: 64px;
+    height: 64px;
+  }
+} 

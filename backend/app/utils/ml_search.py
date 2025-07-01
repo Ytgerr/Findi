@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class MLSearchResponse(BaseModel):
-    sentences: list[str]
-    time_intervals: list[tuple[int, int]]
+    sentences: list[str | None]
+    time_intervals: list[tuple[int | float | None, int | float | None]]
 
 
 class DocumentRequest(BaseModel):

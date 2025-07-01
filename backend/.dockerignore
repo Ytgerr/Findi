@@ -1,2 +1,5 @@
 __pycache__
 .venv
+*.pdf
+*.md
+.ruff_cache
