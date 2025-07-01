@@ -1,6 +1,6 @@
 // API конфигурация и функции для взаимодействия с backend
 
-const API_BASE_URL = 'http://localhost:8000/api/v1' // Измените на ваш backend URL
+const API_BASE_URL = 'http://localhost:8001/api/v1' // Backend URL для Docker Compose
 
 // Универсальная функция для fetch запросов
 const apiRequest = async (endpoint, options = {}) => {

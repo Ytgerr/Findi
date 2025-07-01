@@ -6,7 +6,7 @@ from app.utils.ml_search import ml_search, DocumentRequest
 router = APIRouter(prefix="/api/v1/search", tags=["search"])
 
 ml_url: str = os.getenv("ML_URL") or ""
-search_link = ml_url + "/semantic_search"
+search_link = "http://localhost:8000" + "/semantic_search/"
 
 
 @router.post("/pdf_search")
