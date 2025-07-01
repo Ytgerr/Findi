@@ -10,8 +10,8 @@ def similarity_search(sentences: list, query: str, model) -> list:
 
     query_embedding = model.encode([query], convert_to_numpy=True)
 
-    distances, indices = index.search(query_embedding, k=len(sentences))
-    min_distance = 0.5
+    distances, indices = index.search(query_embedding, k=3)
+    min_distance = 0.4
 
     filtered_results = []
     for i, idx in enumerate(indices[0]):

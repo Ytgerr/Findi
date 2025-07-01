@@ -5,7 +5,6 @@ from nltk.tokenize import sent_tokenize
 from io import BytesIO
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer
-import nltk
 import re
 import os
 

@@ -14,7 +14,7 @@ RUN uv sync --frozen --no-cache
 
 COPY . /app
 
-RUN .venv/bin/python -m nltk.downloader --dir /app/nltk_data punkt
+RUN .venv/bin/python -m nltk.downloader --dir /app/nltk_data punkt_tab
 ENV NLTK_DATA=/app/nltk_data
 
 RUN .venv/bin/python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('Snowflake/snowflake-arctic-embed-l-v2.0')"
