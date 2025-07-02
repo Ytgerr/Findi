@@ -1,23 +1,47 @@
 # Findi: Semantic Search Platform for Audio, Video, and PDF
 
-## Overview
+Платформа семантического поиска для аудио, видео и PDF файлов с использованием машинного обучения.
 
-Findi is a modular semantic search backend designed for efficient information retrieval from audio, video, and PDF documents. Leveraging state-of-the-art NLP and speech-to-text models, Findi enables users to query unstructured data and receive contextually relevant segments with precise time intervals.
+## Архитектура
 
-## Features
+- **Frontend**: React + Vite приложение
+- **Backend**: FastAPI сервер  
+- **ML**: Сервис машинного обучения для семантического поиска
+- **Docker**: Контейнеризация всех компонентов
 
-- **Multimodal Input Support:** Accepts `.mp3`, `.mp4`, and `.pdf` files.
-- **Automatic Transcription:** Utilizes advanced ASR models for audio and video.
-- **Sentence Segmentation:** Applies robust NLP techniques for sentence extraction.
-- **Semantic Search:** Embeds and searches text using transformer-based models.
-- **Time Interval Extraction:** Returns start and end times for audio/video segments matching the query.
-- **REST API:** FastAPI-powered endpoint for seamless integration.
+## Запуск приложения
 
- 
-## License
+### Вариант 1 (Временный): Ручной запуск
 
-MIT License
+1. **ML сервис**:
+```bash
+cd ML
+docker build -t findi-ml .
+docker run -p 8000:8000 findi-ml
+```
 
----
+2. **Backend сервис**:
+```bash
+cd backend
+uv run fastapi dev --port 8001
+```
 
-*Developed for robust, production-grade semantic search across diverse document formats.*
+3. **Frontend (dev режим)**:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Доступ к сервисам
+
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:8001
+- **ML API**: http://localhost:8000
+
+## Требования
+
+- Docker и Docker Compose
+- Node.js 16+ (для разработки frontend)
+- Python 3.8+ и uv (для разработки backend)
+- Git

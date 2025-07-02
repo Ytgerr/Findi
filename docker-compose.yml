@@ -8,14 +8,6 @@ services:
       - ml
     networks:
       - findi-network
-  frontend:
-    image: findi-frontend
-    ports:
-      - 8080:80
-    depends_on:
-      - backend
-    networks:
-      - findi-network
   ml:
     image: findi-ml
     ports:

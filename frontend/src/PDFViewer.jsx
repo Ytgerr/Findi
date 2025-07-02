@@ -23,7 +23,6 @@ function PDFViewer() {
   // Загружаем файл при первом рендере
   useEffect(() => {
     console.log('PDFViewer useEffect - location.state:', location.state)
-    handleSearch()
     
   }, [location.state])
 
